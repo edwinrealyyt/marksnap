@@ -112,11 +112,14 @@
     </div>
 
     <div class="settings-group">
-      <label class="settings-label" for="setting-scale">导出倍率</label>
+      <label class="settings-label" for="setting-scale">
+        导出倍率
+        <span class="settings-hint" title="倍率越高，导出PNG的像素分辨率越大（不影响预览效果）。2x 适合普通分享，3x 适合打印或高分屏。">ⓘ</span>
+      </label>
       <select id="setting-scale" class="settings-select">
-        <option value="1">1x</option>
-        <option value="2" selected>2x (推荐)</option>
-        <option value="3">3x</option>
+        <option value="1">1x · 普通</option>
+        <option value="2" selected>2x · 高清（推荐）</option>
+        <option value="3">3x · 超清</option>
       </select>
     </div>
 
