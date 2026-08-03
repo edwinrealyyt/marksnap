@@ -239,14 +239,17 @@
     if (!md) return '';
 
     // ── Phase 0: Normalize AI-generated / imperfect Markdown syntax ──
-    // 1. Fix bold + code combinations with spaces or asymmetrical stars (e.g. "** `12333` *", "**`12333`*", "*`12333`**")
-    md = md.replace(/(^|[^\*])\*\*?\s*(`[^`\n]+`)\s*\*?\*(?=[^\*]|$)/g, '$1**$2**');
-    md = md.replace(/(^|[^\*])\*\*\s+(`[^`\n]+`)\s+\*\*(?=[^\*]|$)/g, '$1**$2**');
-    md = md.replace(/(^|[^\*])\*\s+(`[^`\n]+`)\s+\*(?=[^\*]|$)/g, '$1*$2*');
+    // 1. Normalize spaced/imperfect stars around inline code (single-line only, no \n)
+    md = md.replace(/(^|[^\*])\*\*?[ \t]*(`[^`\n]+`)[ \t]*\*?\*(?=[^\*]|$)/g, '$1**$2**');
 
-    // 2. Fix bold/italic with leading/trailing internal spaces (e.g. "** text **" -> "**text**")
-    md = md.replace(/(^|[^\*])\*\*\s+([^\*\s\n](?:[^\*\n]*?[^\*\s\n])?)\s+\*\*(?=[^\*]|$)/g, '$1**$2**');
-    md = md.replace(/(^|[^\*])\*\s+([^\*\s\n](?:[^\*\n]*?[^\*\s\n])?)\s+\*(?=[^\*]|$)/g, '$1*$2*');
+    // 2. Convert bold/italic code to explicit HTML tags ("**`code`**" -> "<strong>`code`</strong>")
+    // Fixes marked.js CJK punctuation delimiter bug where trailing Chinese punctuation (，。！？) breaks closing stars
+    md = md.replace(/\*\*(`[^`\n]+`)\*\*/g, '<strong>$1</strong>');
+    md = md.replace(/(^|[^\*])\*(`[^`\n]+`)\*(?=[^\*]|$)/g, '$1<em>$2</em>');
+
+    // 3. Fix spaced bold/italic text on the same line
+    md = md.replace(/(^|[^\*])\*\*[ \t]+([^\*\s\n](?:[^\*\n]*?[^\*\s\n])?)[ \t]+\*\*(?=[^\*]|$)/g, '$1**$2**');
+    md = md.replace(/(^|[^\*])\*[ \t]+([^\*\s\n](?:[^\*\n]*?[^\*\s\n])?)[ \t]+\*(?=[^\*]|$)/g, '$1*$2*');
 
     // ── Phase 1: Join br-split continuation lines ─────────────────
     var rawLines = md.split('\n');
