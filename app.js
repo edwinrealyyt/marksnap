@@ -236,6 +236,17 @@
   // Phase 3: Normalize separator rows
   // Phase 4: Trim cell whitespace
   function preprocessMarkdown(md) {
+    if (!md) return '';
+
+    // ── Phase 0: Normalize AI-generated / imperfect Markdown syntax ──
+    // 1. Fix bold + code combinations with spaces or asymmetrical stars (e.g. "** `12333` *", "**`12333`*", "*`12333`**")
+    md = md.replace(/(^|[^\*])\*\*?\s*(`[^`\n]+`)\s*\*?\*(?=[^\*]|$)/g, '$1**$2**');
+    md = md.replace(/(^|[^\*])\*\*\s+(`[^`\n]+`)\s+\*\*(?=[^\*]|$)/g, '$1**$2**');
+    md = md.replace(/(^|[^\*])\*\s+(`[^`\n]+`)\s+\*(?=[^\*]|$)/g, '$1*$2*');
+
+    // 2. Fix bold/italic with leading/trailing internal spaces (e.g. "** text **" -> "**text**")
+    md = md.replace(/(^|[^\*])\*\*\s+([^\*\s\n](?:[^\*\n]*?[^\*\s\n])?)\s+\*\*(?=[^\*]|$)/g, '$1**$2**');
+    md = md.replace(/(^|[^\*])\*\s+([^\*\s\n](?:[^\*\n]*?[^\*\s\n])?)\s+\*(?=[^\*]|$)/g, '$1*$2*');
 
     // ── Phase 1: Join br-split continuation lines ─────────────────
     var rawLines = md.split('\n');
