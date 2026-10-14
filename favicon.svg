@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="marksnap-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="28" height="28" rx="7" fill="url(#marksnap-grad)"/>
+  <path d="M8.5 22.5V9.5h4l3.5 8 3.5-8h4v13h-3.3v-8.3l-2.9 6.6h-2.6l-2.9-6.6v8.3H8.5z" fill="#ffffff"/>
+</svg>

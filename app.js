@@ -224,9 +224,9 @@
     '## 8. 链接、多媒体与折叠卡片 (Rich Components)',
     '',
     '- **超链接测试**：[访问 MarkSnap 项目主页](https://github.com) 或自动转链 <https://github.com>',
-    '- **内嵌矢量图标**：',
+    '- **内嵌矢量图标 / 徽章**：',
     '',
-    '  ![SVG 图标](data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="48" viewBox="0 0 320 48"><rect width="320" height="48" rx="8" fill="%236366f1"/><text x="160" y="29" fill="%23fff" font-size="14" font-family="sans-serif" font-weight="600" text-anchor="middle">🎨 MarkSnap 优雅视觉排版引擎</text></svg>)',
+    '  ![MarkSnap 品牌徽章](data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzODAiIGhlaWdodD0iNTYiIHZpZXdCb3g9IjAgMCAzODAgNTYiIGZpbGw9Im5vbmUiPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJiZy1ncmFkIiB4MT0iMCIgeTE9IjAiIHgyPSIzODAiIHkyPSI1NiIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgogICAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNjM2NmYxIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2E4NTVmNyIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3Qgd2lkdGg9IjM4MCIgaGVpZ2h0PSI1NiIgcng9IjEyIiBmaWxsPSJ1cmwoI2JnLWdyYWQpIi8+CiAgPCEtLSBMb2dvIEljb24gQ29udGFpbmVyIC0tPgogIDxyZWN0IHg9IjE0IiB5PSIxMSIgd2lkdGg9IjM0IiBoZWlnaHQ9IjM0IiByeD0iOCIgZmlsbD0iI2ZmZmZmZiIgZmlsbC1vcGFjaXR5PSIwLjIiLz4KICA8cGF0aCBkPSJNMjIgMzdWMjFoNC4ybDMuOCA5IDMuOC05SDM4djE2aC0zLjJ2LTkuNWwtMy4yIDcuNWgtMi42bC0zLjItNy41VjM3SDIyeiIgZmlsbD0iI2ZmZmZmZiIvPgogIDwhLS0gVGV4dCAtLT4KICA8dGV4dCB4PSI2MCIgeT0iMjciIGZpbGw9IiNmZmZmZmYiIGZvbnQtc2l6ZT0iMTUiIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLCBCbGlua01hY1N5c3RlbUZvbnQsICdTZWdvZSBVSScsIFBpbmdGYW5nIFNDLCBzYW5zLXNlcmlmIiBmb250LXdlaWdodD0iNzAwIiBsZXR0ZXItc3BhY2luZz0iMC41Ij5NYXJrU25hcDwvdGV4dD4KICA8dGV4dCB4PSI2MCIgeT0iNDIiIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC44NSIgZm9udC1zaXplPSIxMS41IiBmb250LWZhbWlseT0iLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBQaW5nRmFuZyBTQywgc2Fucy1zZXJpZiIgZm9udC13ZWlnaHQ9IjUwMCI+6K6pIE1hcmtkb3duIOWIhuS6q+abtOS8mOmbhSDCtyDnn6Lph4/muLLmn5PmtYvor5U8L3RleHQ+Cjwvc3ZnPg==)',
     '',
     '<details>',
     '<summary><b>🔍 点击展开查看使用秘籍 (Tips & FAQ)</b></summary>',
@@ -381,6 +381,26 @@
     // 3. Fix spaced bold/italic text on the same line
     md = md.replace(/(^|[^\*])\*\*[ \t]+([^\*\s\n](?:[^\*\n]*?[^\*\s\n])?)[ \t]+\*\*(?=[^\*]|$)/g, '$1**$2**');
     md = md.replace(/(^|[^\*])\*[ \t]+([^\*\s\n](?:[^\*\n]*?[^\*\s\n])?)[ \t]+\*(?=[^\*]|$)/g, '$1*$2*');
+
+    // 4. Auto-fix raw/unencoded SVG data URIs inside markdown image tags ![alt](data:image/svg+xml...)
+    // Marked.js breaks when raw <svg> tags or spaces are inside markdown parentheses
+    md = md.replace(/!\[([^\]]*)\]\(\s*data:image\/svg\+xml(?:;[^,]*)?,([\s\S]*?<\/svg>)\s*\)/gi, function (_, alt, svgBody) {
+      try {
+        var cleanSvg = svgBody.replace(/%23/g, '#');
+        var encoded = '';
+        if (typeof btoa === 'function') {
+          encoded = btoa(unescape(encodeURIComponent(cleanSvg)));
+        } else if (typeof Buffer !== 'undefined') {
+          encoded = Buffer.from(cleanSvg, 'utf-8').toString('base64');
+        }
+        if (encoded) {
+          return '![' + alt + '](data:image/svg+xml;base64,' + encoded + ')';
+        }
+      } catch (err) {
+        console.warn('SVG data URI conversion error:', err);
+      }
+      return _;
+    });
 
     // ── Phase 1: Join br-split continuation lines ─────────────────
     var rawLines = md.split('\n');
