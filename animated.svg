@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="96" viewBox="0 0 400 96" fill="none">
+  <defs>
+    <!-- Background Gradient with animated flow -->
+    <linearGradient id="flow-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5">
+        <animate attributeName="stop-color" values="#4f46e5;#7c3aed;#2563eb;#4f46e5" dur="6s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="50%" stop-color="#7c3aed">
+        <animate attributeName="stop-color" values="#7c3aed;#db2777;#4f46e5;#7c3aed" dur="6s" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="#9333ea">
+        <animate attributeName="stop-color" values="#9333ea;#4f46e5;#db2777;#9333ea" dur="6s" repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+  </defs>
+
+  <!-- Card Container -->
+  <rect width="400" height="96" rx="16" fill="url(#flow-grad)"/>
+  
+  <!-- Subtle inner border overlay -->
+  <rect x="1" y="1" width="398" height="94" rx="15" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1.5"/>
+
+  <!-- Left: Animated Logo Orb -->
+  <g transform="translate(48, 48)">
+    <!-- Pulsing Outer Dashed Ring -->
+    <circle cx="0" cy="0" r="22" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="8s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- Breathing Glow Circle -->
+    <circle cx="0" cy="0" r="18" fill="#ffffff" fill-opacity="0.25">
+      <animate attributeName="r" values="16;20;16" dur="2.5s" repeatCount="indefinite"/>
+      <animate attributeName="fill-opacity" values="0.15;0.35;0.15" dur="2.5s" repeatCount="indefinite"/>
+    </circle>
+
+    <!-- Center Icon Mark M -->
+    <g transform="translate(-11, -11) scale(0.7)">
+      <path d="M4 26V6h5.5l5.5 12 5.5-12H26v20h-4.5v-12.5l-4.5 10h-3.5l-4.5-10V26H4z" fill="#ffffff"/>
+    </g>
+
+    <!-- Revolving satellite particle -->
+    <circle cx="22" cy="0" r="2.5" fill="#fbcfe8">
+      <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="3s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Middle: Dynamic Text Title & Subtitle -->
+  <text x="96" y="42" fill="#ffffff" font-size="16" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', PingFang SC, sans-serif" font-weight="700" letter-spacing="0.5">
+    SVG 原生动图演示 (Animated SVG)
+  </text>
+  <text x="96" y="65" fill="#ffffff" fill-opacity="0.82" font-size="12" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', PingFang SC, sans-serif" font-weight="500">
+    ⚡ 纯代码驱动 · 矢量无损 · 零外部资源开销
+  </text>
+
+  <!-- Right: Equalizer Dynamic Bouncing Bars -->
+  <g transform="translate(325, 34)">
+    <!-- Bar 1 -->
+    <rect x="0" y="8" width="4" height="18" rx="2" fill="#ffffff" opacity="0.9">
+      <animate attributeName="height" values="8;24;12;26;8" dur="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="18;2;14;0;18" dur="1.2s" repeatCount="indefinite"/>
+    </rect>
+    <!-- Bar 2 -->
+    <rect x="8" y="2" width="4" height="24" rx="2" fill="#ffffff" opacity="0.95">
+      <animate attributeName="height" values="24;10;28;14;24" dur="1.1s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="2;16;0;12;2" dur="1.1s" repeatCount="indefinite"/>
+    </rect>
+    <!-- Bar 3 -->
+    <rect x="16" y="14" width="4" height="12" rx="2" fill="#ffffff" opacity="0.9">
+      <animate attributeName="height" values="12;28;6;20;12" dur="1.3s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="14;0;20;6;14" dur="1.3s" repeatCount="indefinite"/>
+    </rect>
+    <!-- Bar 4 -->
+    <rect x="24" y="6" width="4" height="20" rx="2" fill="#ffffff" opacity="0.95">
+      <animate attributeName="height" values="20;8;26;12;20" dur="1.15s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="6;18;0;14;6" dur="1.15s" repeatCount="indefinite"/>
+    </rect>
+    <!-- Bar 5 -->
+    <rect x="32" y="12" width="4" height="14" rx="2" fill="#ffffff" opacity="0.85">
+      <animate attributeName="height" values="14;22;10;26;14" dur="1.25s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="12;4;16;0;12" dur="1.25s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+</svg>
