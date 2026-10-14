@@ -14,6 +14,7 @@
 
   var btnDownload = document.getElementById('btn-download');
   var btnCopy = document.getElementById('btn-copy');
+  var btnSample = document.getElementById('btn-sample');
   var btnPaste = document.getElementById('btn-paste');
   var btnClear = document.getElementById('btn-clear');
   var btnLoadFile = document.getElementById('btn-load-file');
@@ -58,65 +59,186 @@
     console.warn('marked config error:', e);
   }
 
-  // ─── Sample Markdown ─────────────────────────────────────────────
+  // ─── Sample Markdown (Comprehensive Feature Test) ─────────────────
   var SAMPLE_MD = [
-    '# 🚀 MarkSnap 使用演示',
+    '# 🚀 MarkSnap 全特性测试文档 (H1)',
     '',
-    '将 AI 回答 / Markdown 内容一键转为**精美截图**，方便分享到微信、钉钉、飞书等平台。',
+    '本示例文本涵盖 **Markdown 全部核心语法与排版扩展特性**，便于全面测试卡片视觉、代码高亮、数学公式及特殊排版自愈能力。',
     '',
-    '## ✨ 标准 Markdown 表格',
+    '## 1. 标题层级测试 (Headings H2 ~ H6)',
     '',
-    '| 功能 | 说明 | 状态 |',
-    '|------|------|------|',
-    '| Markdown 渲染 | 完整的 GFM 支持 | ✅ 已完成 |',
-    '| 代码高亮 | 支持 190+ 语言 | ✅ 已完成 |',
-    '| 多主题切换 | 6 种精美主题 | ✅ 已完成 |',
-    '| 导出 PNG | 高清多倍率导出 | ✅ 已完成 |',
-    '| 复制到剪贴板 | 一键复制图片 | ✅ 已完成 |',
+    '### 1.1 三级标题 (H3 Heading)',
+    '#### 1.2 四级标题 (H4 Heading)',
+    '##### 1.3 五级标题 (H5 Heading)',
+    '###### 1.4 六级标题 (H6 Heading)',
     '',
-    '## 🤖 AI 生成的断行表格（自动修复）',
+    '---',
     '',
-    '> MarkSnap 自动修复 AI 输出的带 `<br>` 断行表格，无需手动整理格式。',
+    '## 2. 文本行内样式 (Inline Formatting)',
     '',
-    '| 维度 | GPT-4o | Gemini 1.5 Pro<br>',
+    '- **加粗文本** (`**粗体**` 或 `__粗体__`)',
+    '- *斜体文本* (`*斜体*` 或 `_斜体_`)',
+    '- ***粗斜体结合*** (`***粗斜体***`)',
+    '- ~~删除线效果~~ (`~~删除线~~`)',
+    '- 文本高亮标记：<mark>重点突出标注</mark> (`<mark>高亮</mark>`)',
+    '- 行内等宽代码：`const timestamp = Date.now();`',
+    '- 键盘按键徽标：<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>',
+    '- 上标与下标：`H`<sub>2</sub>`O`（水分子），`2`<sup>10</sup> = 1024',
+    '- 中文标点与代码混合兼容测试：**`config.json`**，以及 *`options`* 参数解析正常闭合。',
+    '',
+    '---',
+    '',
+    '## 3. 引用块 (Blockquotes)',
+    '',
+    '> 💡 **技术卡片生成器**：MarkSnap 可将任意 Markdown 文档或 AI 对话一键转为高颜值截图。',
+    '> 所有渲染与图片生成均在本地浏览器内完成，无需上传服务器，保护隐私。',
+    '',
+    '> 一级引用嵌套测试',
+    '> > 二级嵌套引用：展示边框层级与文字深度',
+    '> > > 三级深度引用：依然支持行内代码 `console.log()` 与格式',
+    '',
+    '---',
+    '',
+    '## 4. 丰富列表 (Lists)',
+    '',
+    '### 4.1 无序列表与多层级嵌套',
+    '- 🎨 **多主题体系**',
+    '  - 经典质感：亮色白、暗色黑、GitHub 原生风',
+    '  - 潮流渐变卡片：',
+    '    - 蓝紫渐变（优雅深邃）',
+    '    - 日落渐变（温暖活力）',
+    '    - 翠绿渐变（清新护眼）',
+    '- 📐 **精细化控制**：自由微调导出宽度、卡片内边距、字体大小与导出倍率',
+    '',
+    '### 4.2 有序列表 (流程操作)',
+    '1. **输入内容**：在左侧编辑器中直接输入或粘贴 Markdown 格式文本',
+    '2. **调节设置**：在顶部控制栏挑选喜爱的主题与布局尺寸',
+    '   1. 自由开启或关闭底部水印标识',
+    '   2. 选择导出倍率（推荐 2x 高清模式）',
+    '3. **一键导出**：点击「下载 PNG」保存高清图，或点击「复制图片」直达系统剪贴板',
+    '',
+    '### 4.3 任务清单 (Task Lists)',
+    '- [x] 完整 CommonMark / GFM 基础排版兼容',
+    '- [x] KaTeX 高性能 LaTeX 数学公式渲染引擎',
+    '- [x] 多语言代码高亮与 macOS 拟物窗口红黄绿圆点',
+    '- [x] 智能自愈 AI 输出的错乱/断行表格',
+    '- [ ] 自定义个性化水印文字配置（规划中）',
+    '',
+    '---',
+    '',
+    '## 5. 表格渲染 (Tables)',
+    '',
+    '### 5.1 标准 GFM 对齐表格',
+    '| 特性模块 (左对齐) | 解析引擎 (居中) | 支持规格 (右对齐) | 运行状态 (居中) |',
+    '| :--- | :---: | ---: | :---: |',
+    '| GFM 核心语法 | Marked.js v4 | 100% 规范兼容 | 🟢 正常 |',
+    '| 语法高亮引擎 | Highlight.js | 190+ 编程语言 | 🟢 正常 |',
+    '| LaTeX 数学公式 | KaTeX 原生加速 | 零外部依赖秒开 | 🟢 正常 |',
+    '| 高清卡片导出 | html2canvas | 1x / 2x / 3x 超清 | 🟢 正常 |',
+    '',
+    '### 5.2 AI 错乱表格自愈测试（带 `<br>` 换行单元格）',
+    '| 模型维度 | GPT-4o | Gemini 1.5 Pro<br>',
     '<br>*Google 出品* | Claude 3.5 Sonnet |',
     '| --- | --- | --- | --- |',
     '| **上下文窗口** | **128K tokens**<br>',
     '<br>（约 10 万字）| **100 万 tokens**<br>',
-    '<br>（业界最长，适合超长文档分析）| **200K tokens** |',
+    '<br>（业界最长，超大文档分析）| **200K tokens** |',
     '| **代码能力** | **极强**<br>',
     '<br>插件生态丰富，支持代码执行 | **较强**<br>',
-    '<br>与 Google 工具链深度集成 | **顶尖**<br>',
-    '<br>公认代码理解与生成最佳 |',
-    '| **多模态支持** | ✅ 图片 / 视频 / 音频 | ✅ 图片 / 视频 / 音频 | ✅ 图片（文字理解最强）|',
-    '| **中文表现** | 良好 | 良好 | 优秀 |',
-    '',
-    '## 💻 代码高亮',
-    '',
-    '```python',
-    'def fibonacci(n: int) -> list[int]:',
-    '    """生成斐波那契数列"""',
-    '    fib = [0, 1]',
-    '    for i in range(2, n):',
-    '        fib.append(fib[i-1] + fib[i-2])',
-    '    return fib',
-    '',
-    'print(fibonacci(10))',
-    '# [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]',
-    '```',
-    '',
-    '## 📝 引用 & 列表',
-    '',
-    '> **提示：** 将 ChatGPT、Gemini、Claude 等 AI 的回答直接粘贴到左侧编辑器，右侧实时预览，点击「下载 PNG」即可导出。',
-    '',
-    '- 🎨 支持 **6 种导出主题**：亮色、暗色、GitHub、蓝紫渐变、日落渐变、翠绿渐变',
-    '- 📐 可调节宽度、内边距、字号',
-    '- 🔍 支持 1x / 2x / 3x 高清导出',
-    '- 📋 支持一键复制图片到剪贴板',
+    '<br>深度集成 Google 工具链 | **顶尖**<br>',
+    '<br>公认逻辑与代码推理最佳 |',
+    '| **多模态能力** | ✅ 图像 / 音频 / 视频 | ✅ 全模态深度解析 | ✅ 顶尖视觉理解 |',
     '',
     '---',
     '',
-    '*由 MarkSnap 生成 · 让分享更优雅*'
+    '## 6. 代码块与语法高亮 (Code Blocks)',
+    '',
+    '### 6.1 JavaScript 异步剪贴板操作',
+    '```javascript',
+    '// 异步将 Canvas 画面写入系统剪贴板',
+    'async function copyCanvasToClipboard(canvas) {',
+    '  const blob = await new Promise(resolve => canvas.toBlob(resolve, \'image/png\'));',
+    '  await navigator.clipboard.write([',
+    '    new ClipboardItem({ [blob.type]: blob })',
+    '  ]);',
+    '  return { success: true, timestamp: Date.now() };',
+    '}',
+    '```',
+    '',
+    '### 6.2 Python 经典快速排序',
+    '```python',
+    'def quick_sort(arr: list[int]) -> list[int]:',
+    '    """经典快速排序算法"""',
+    '    if len(arr) <= 1:',
+    '        return arr',
+    '    pivot = arr[len(arr) // 2]',
+    '    left = [x for x in arr if x < pivot]',
+    '    middle = [x for x in arr if x == pivot]',
+    '    right = [x for x in arr if x > pivot]',
+    '    return quick_sort(left) + middle + quick_sort(right)',
+    '',
+    'print(quick_sort([3, 6, 8, 10, 1, 2, 1]))',
+    '# [1, 1, 2, 3, 6, 8, 10]',
+    '```',
+    '',
+    '### 6.3 Shell / 终端命令',
+    '```bash',
+    '# 启动本地开发预览服务器',
+    'npx serve . -p 8080',
+    '```',
+    '',
+    '### 6.4 JSON 配置结构',
+    '```json',
+    '{',
+    '  "name": "marksnap",',
+    '  "theme": "gradient-blue",',
+    '  "scale": 2,',
+    '  "watermark": true',
+    '}',
+    '```',
+    '',
+    '---',
+    '',
+    '## 7. 数学公式排版 (KaTeX LaTeX)',
+    '',
+    '### 7.1 行内公式 (Inline Math)',
+    '爱因斯坦质能方程为 $E = mc^2$，高斯正态分布密度函数为 $f(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}} e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}$。',
+    '',
+    '### 7.2 独立块级公式 (Display Math)',
+    '欧拉恒等式与高斯积分方程：',
+    '$$',
+    'e^{i\\pi} + 1 = 0 \\quad \\text{且} \\quad \\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}',
+    '$$',
+    '',
+    '二维平面坐标旋转变换矩阵：',
+    '$$',
+    '\\begin{pmatrix}',
+    '\\cos\\theta & -\\sin\\theta \\\\',
+    '\\sin\\theta & \\cos\\theta',
+    '\\end{pmatrix}',
+    '\\begin{pmatrix} x \\\\ y \\end{pmatrix} = \\begin{pmatrix} x\' \\\\ y\' \\end{pmatrix}',
+    '$$',
+    '',
+    '---',
+    '',
+    '## 8. 链接、多媒体与折叠卡片 (Rich Components)',
+    '',
+    '- **超链接测试**：[访问 MarkSnap 项目主页](https://github.com) 或自动转链 <https://github.com>',
+    '- **内嵌矢量图标**：',
+    '',
+    '  ![SVG 图标](data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="48" viewBox="0 0 320 48"><rect width="320" height="48" rx="8" fill="%236366f1"/><text x="160" y="29" fill="%23fff" font-size="14" font-family="sans-serif" font-weight="600" text-anchor="middle">🎨 MarkSnap 优雅视觉排版引擎</text></svg>)',
+    '',
+    '<details>',
+    '<summary><b>🔍 点击展开查看使用秘籍 (Tips & FAQ)</b></summary>',
+    '',
+    '1. **快捷键缩进**：在编辑器中按 <kbd>Tab</kbd> 可快速插入 2 个空格缩进。',
+    '2. **文件拖放**：直接将电脑中的 `.md` 文件拖入左侧输入框即可快速读取。',
+    '3. **最佳画质**：导出图片用于社交平台或技术社区分享时，建议选择 **2x** 或 **3x** 高清模式。',
+    '</details>',
+    '',
+    '---',
+    '',
+    '*由 MarkSnap 强力驱动 · 让技术分享更优雅*'
   ].join('\n');
 
   // ─── Initialize ──────────────────────────────────────────────────
@@ -169,6 +291,15 @@
 
     btnDownload.addEventListener('click', downloadImage);
     btnCopy.addEventListener('click', copyImageToClipboard);
+
+    if (btnSample) {
+      btnSample.addEventListener('click', function () {
+        editor.value = SAMPLE_MD;
+        renderPreview();
+        updateStats();
+        showToast('已加载全特性测试示例文本', 'success');
+      });
+    }
 
     btnPaste.addEventListener('click', function () {
       navigator.clipboard.readText().then(function (text) {
@@ -306,15 +437,29 @@
         // Phase 2: Remove all <br> tags, replace with space
         ln = ln.replace(/<br\s*\/?>/gi, ' ');
 
-        // Phase 3: Detect & normalize separator rows
+        // Phase 3: Detect & normalize separator rows (preserving column alignments)
         var stripped = ln.replace(/\s/g, '');
         // A separator row looks like: |---|---| or |:---|:---:| etc.
         if (/^\|?([-:]+\|)+[-:]*$/.test(stripped)) {
-          var pipeCount = (ln.match(/\|/g) || []).length;
-          var colCount = Math.max(pipeCount - 1, 1);
-          var parts = [];
-          for (var k = 0; k < colCount; k++) parts.push('---');
-          ln = '| ' + parts.join(' | ') + ' |';
+          var cells = ln.split('|');
+          if (cells.length > 2) {
+            var parts = [];
+            for (var k = 1; k < cells.length - 1; k++) {
+              var tc = cells[k].replace(/\s/g, '');
+              var left = tc.charAt(0) === ':';
+              var right = tc.charAt(tc.length - 1) === ':';
+              if (left && right) {
+                parts.push(':---:');
+              } else if (right) {
+                parts.push('---:');
+              } else if (left) {
+                parts.push(':---');
+              } else {
+                parts.push('---');
+              }
+            }
+            ln = '| ' + parts.join(' | ') + ' |';
+          }
         }
 
         // Phase 4: Collapse multiple spaces, trim each cell
