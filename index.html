@@ -14,11 +14,11 @@
   <link rel="stylesheet" href="lib/hljs-github-dark.min.css" id="hljs-theme-dark">
   <link rel="stylesheet" href="lib/hljs-github.min.css" id="hljs-theme-light" disabled>
 
-  <!-- KaTeX Math Styles (local) -->
-  <link rel="stylesheet" href="lib/katex.min.css">
+  <!-- KaTeX Math Styles (local with CDN fallback) -->
+  <link rel="stylesheet" href="lib/katex.min.css" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css';">
 
   <!-- App Styles -->
-  <link rel="stylesheet" href="style.css?v=1.0.2">
+  <link rel="stylesheet" href="style.css?v=1.0.3">
 </head>
 <body>
 
@@ -218,14 +218,37 @@
     <p>正在生成图片...</p>
   </div>
 
-  <!-- Dependencies (local files for reliability) -->
+  <!-- AMD / Define Safeguard: Prevents browser extensions or ads from hiding UMD globals -->
+  <script>
+    if (typeof window.define === 'function' && window.define.amd) {
+      window._stashedAmdDefine = window.define;
+      window.define = undefined;
+    }
+  </script>
+
+  <!-- Dependencies (local files with auto CDN fallback) -->
   <script src="lib/marked.min.js"></script>
+  <script>
+    if (typeof marked === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"><\/script>');
+    }
+  </script>
   <script src="lib/highlight.min.js"></script>
   <script src="lib/katex.min.js"></script>
+  <script>
+    if (typeof katex === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"><\/script>');
+    }
+  </script>
   <script src="lib/html2canvas.min.js"></script>
-
+  <script>
+    if (window._stashedAmdDefine) {
+      window.define = window._stashedAmdDefine;
+      delete window._stashedAmdDefine;
+    }
+  </script>
 
   <!-- App Script -->
-  <script src="app.js?v=1.0.2"></script>
+  <script src="app.js?v=1.0.3"></script>
 </body>
 </html>

@@ -357,7 +357,7 @@
       if (lang === 'math' || lang === 'latex' || lang === 'katex') {
         return lead + indent + saveMath(body, true);
       }
-      return saveCode(match);
+      return lead + saveCode(indent + fence + info + '\n' + body + '\n' + indent + fence);
     });
 
     // 2. Protect inline code spans (`...`)
@@ -397,6 +397,15 @@
     };
   }
 
+  function getMarkedParser() {
+    var m = (typeof marked !== 'undefined') ? marked : (typeof window !== 'undefined' ? window.marked : null);
+    if (!m) return null;
+    if (typeof m === 'function') return m;
+    if (typeof m.parse === 'function') return m.parse.bind(m);
+    if (typeof m.marked === 'function') return m.marked;
+    return null;
+  }
+
   function renderMathPlaceholders(html, mathStore) {
     if (!mathStore || !mathStore.length) return html;
     return html.replace(/MARKSNAPMATH(\d+)END/g, function (match, idx) {
@@ -421,6 +430,8 @@
     });
   }
 
+  var renderRetryTimer = null;
+
   // ─── Render Preview ──────────────────────────────────────────────
   function renderPreview() {
     var md = editor.value.trim();
@@ -439,34 +450,49 @@
       return;
     }
 
+    var parseFn = getMarkedParser();
+    if (!parseFn) {
+      clearTimeout(renderRetryTimer);
+      renderRetryTimer = setTimeout(function () {
+        renderPreview();
+      }, 150);
+      return;
+    }
+
     var extracted = extractMathAndPreprocess(md);
     var cleaned = extracted.markdown;
     var mathStore = extracted.mathStore;
     var html = '';
 
     try {
-      if (typeof marked === 'undefined') {
-        html = '<pre style="white-space:pre-wrap">' + escapeHtml(md) + '</pre>';
-      } else {
-        var result = marked.parse(cleaned);
-        if (result && typeof result.then === 'function') {
-          // async version
-          result.then(function (h) {
+      var result = parseFn(cleaned);
+      if (result && typeof result.then === 'function') {
+        result.then(function (h) {
+          try {
             captureContent.innerHTML = renderMathPlaceholders(h, mathStore);
-            applyCodeHighlighting();
-          }).catch(function () {
-            captureContent.innerHTML = '<pre style="white-space:pre-wrap">' + escapeHtml(md) + '</pre>';
-          });
-          return;
-        }
-        html = result || '';
+          } catch (err) {
+            console.error('renderMathPlaceholders error:', err);
+            captureContent.innerHTML = h;
+          }
+          applyCodeHighlighting();
+        }).catch(function (err) {
+          console.error('marked async parse error:', err);
+          captureContent.innerHTML = '<pre style="white-space:pre-wrap">' + escapeHtml(md) + '</pre>';
+        });
+        return;
       }
+      html = result || '';
     } catch (e) {
-      console.error('marked.parse error:', e);
+      console.error('marked parse error:', e);
       html = '<pre style="white-space:pre-wrap">' + escapeHtml(md) + '</pre>';
     }
 
-    captureContent.innerHTML = renderMathPlaceholders(html, mathStore);
+    try {
+      captureContent.innerHTML = renderMathPlaceholders(html, mathStore);
+    } catch (err) {
+      console.error('renderMathPlaceholders error:', err);
+      captureContent.innerHTML = html;
+    }
     applyCodeHighlighting();
   }
 
