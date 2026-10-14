@@ -330,6 +330,97 @@
     return result.join('\n');
   }
 
+  // ─── Math & Code Placeholder Extraction ──────────────────────────
+  // Extract fenced code, inline code, and LaTeX math ($...$, $$...$$, \(...\), \[...\])
+  // BEFORE marked.js runs so backslashes (\%, \times, \\), underscores, and asterisks
+  // inside formulas are never mangled by Markdown parsing.
+  function extractMathAndPreprocess(md) {
+    var mathStore = [];
+    var codeStore = [];
+
+    function saveCode(match) {
+      var id = codeStore.length;
+      codeStore.push(match);
+      return 'MARKSNAPCODE' + id + 'END';
+    }
+
+    function saveMath(tex, display) {
+      var id = mathStore.length;
+      mathStore.push({ tex: tex.trim(), display: !!display });
+      return 'MARKSNAPMATH' + id + 'END';
+    }
+
+    // 1. Protect fenced code blocks (```...``` or ~~~...~~~)
+    //    Wait: if the language is ```math or ```latex, render it as display math!
+    md = md.replace(/(^|\n)([ \t]*)(`{3,}|~{3,})([^\n]*)\n([\s\S]*?)\n[ \t]*\3[ \t]*(?=\n|$)/g, function (match, lead, indent, fence, info, body) {
+      var lang = (info || '').trim().toLowerCase();
+      if (lang === 'math' || lang === 'latex' || lang === 'katex') {
+        return lead + indent + saveMath(body, true);
+      }
+      return saveCode(match);
+    });
+
+    // 2. Protect inline code spans (`...`)
+    md = md.replace(/(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/g, function (match) {
+      return saveCode(match);
+    });
+
+    // 3. Extract display math: $$ ... $$ (single-line or multi-line)
+    md = md.replace(/(^|[^\\])\$\$((?:\\.|[^$]|(?:\$(?!\$)))+?)\$\$/g, function (_, prefix, tex) {
+      return prefix + saveMath(tex, true);
+    });
+
+    // 4. Extract display math: \[ ... \]
+    md = md.replace(/\\\[([\s\S]+?)\\\]/g, function (_, tex) {
+      return saveMath(tex, true);
+    });
+
+    // 5. Extract inline math: \( ... \)
+    md = md.replace(/\\\(([\s\S]+?)\\\)/g, function (_, tex) {
+      return saveMath(tex, false);
+    });
+
+    // 6. Extract inline math: $ ... $ (single-line, no leading/trailing spaces inside $)
+    md = md.replace(/(^|[^\\$])\$((?:\\.|[^$\n])+?)\$(?!\$|\d)/g, function (match, prefix, tex) {
+      if (/^\s|\s$/.test(tex)) return match;
+      return prefix + saveMath(tex, false);
+    });
+
+    // 7. Restore code blocks before standard markdown preprocessing
+    md = md.replace(/MARKSNAPCODE(\d+)END/g, function (_, idx) {
+      return codeStore[parseInt(idx, 10)];
+    });
+
+    return {
+      markdown: preprocessMarkdown(md),
+      mathStore: mathStore
+    };
+  }
+
+  function renderMathPlaceholders(html, mathStore) {
+    if (!mathStore || !mathStore.length) return html;
+    return html.replace(/MARKSNAPMATH(\d+)END/g, function (match, idx) {
+      var item = mathStore[parseInt(idx, 10)];
+      if (!item) return match;
+      if (typeof katex !== 'undefined' && typeof katex.renderToString === 'function') {
+        try {
+          return katex.renderToString(item.tex, {
+            displayMode: item.display,
+            throwOnError: false,
+            strict: false,
+            output: 'html'
+          });
+        } catch (e) {
+          console.warn('KaTeX render error:', e);
+        }
+      }
+      var escaped = escapeHtml(item.tex);
+      return item.display
+        ? '<div class="math-fallback math-display">' + escaped + '</div>'
+        : '<span class="math-fallback math-inline">' + escaped + '</span>';
+    });
+  }
+
   // ─── Render Preview ──────────────────────────────────────────────
   function renderPreview() {
     var md = editor.value.trim();
@@ -348,7 +439,9 @@
       return;
     }
 
-    var cleaned = preprocessMarkdown(md);
+    var extracted = extractMathAndPreprocess(md);
+    var cleaned = extracted.markdown;
+    var mathStore = extracted.mathStore;
     var html = '';
 
     try {
@@ -359,7 +452,7 @@
         if (result && typeof result.then === 'function') {
           // async version
           result.then(function (h) {
-            captureContent.innerHTML = h;
+            captureContent.innerHTML = renderMathPlaceholders(h, mathStore);
             applyCodeHighlighting();
           }).catch(function () {
             captureContent.innerHTML = '<pre style="white-space:pre-wrap">' + escapeHtml(md) + '</pre>';
@@ -373,7 +466,7 @@
       html = '<pre style="white-space:pre-wrap">' + escapeHtml(md) + '</pre>';
     }
 
-    captureContent.innerHTML = html;
+    captureContent.innerHTML = renderMathPlaceholders(html, mathStore);
     applyCodeHighlighting();
   }
 

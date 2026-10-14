@@ -962,6 +962,21 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-radius: 3px;
 }
 
+/* KaTeX Math Formulas */
+.markdown-body .katex {
+  font-size: 1.08em;
+  color: inherit;
+}
+.markdown-body .katex-display {
+  margin: 1em 0;
+  padding: 0.2em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.markdown-body .katex-mathml {
+  display: none !important;
+}
+
 /* ---------- Toast ---------- */
 .toast {
   position: fixed;
