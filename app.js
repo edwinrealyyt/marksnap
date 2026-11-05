@@ -763,12 +763,31 @@
     }
   }
 
-  // ─── Download Image ──────────────────────────────────────────────
-  function downloadImage() {
-    var scale = parseInt(settingScale.value);
-    showLoading(true);
+  // ─── Render Cache ────────────────────────────────────────────────
+  // html2canvas + PNG encoding is the slow part. Cache the resulting
+  // PNG blob keyed by a snapshot of the capture DOM, so repeated
+  // copy/download of unchanged content is instant.
+  var renderCache = { key: null, promise: null };
 
-    sleep(50).then(function () {
+  function getRenderKey() {
+    return [
+      settingScale.value,
+      captureWrapper.className,
+      captureWrapper.offsetWidth,
+      captureWrapper.offsetHeight,
+      captureWrapper.outerHTML,
+    ].join('\u0001');
+  }
+
+  // Returns Promise<Blob> (image/png)
+  function renderImageBlob() {
+    var key = getRenderKey();
+    if (renderCache.key === key && renderCache.promise) {
+      return renderCache.promise;
+    }
+
+    var scale = parseInt(settingScale.value) || 2;
+    var promise = nextFrame().then(function () {
       return html2canvas(captureWrapper, {
         scale: scale,
         useCORS: true,
@@ -778,10 +797,38 @@
         removeContainer: true,
       });
     }).then(function (canvas) {
+      return new Promise(function (resolve, reject) {
+        canvas.toBlob(function (blob) {
+          // Release canvas memory early
+          canvas.width = canvas.height = 0;
+          if (!blob) { reject(new Error('toBlob failed')); return; }
+          resolve(blob);
+        }, 'image/png');
+      });
+    });
+
+    renderCache.key = key;
+    renderCache.promise = promise;
+    promise.catch(function () {
+      if (renderCache.promise === promise) {
+        renderCache.key = null;
+        renderCache.promise = null;
+      }
+    });
+    return promise;
+  }
+
+  // ─── Download Image ──────────────────────────────────────────────
+  function downloadImage() {
+    showLoading(true);
+
+    renderImageBlob().then(function (blob) {
+      var url = URL.createObjectURL(blob);
       var link = document.createElement('a');
       link.download = 'marksnap_' + Date.now() + '.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = url;
       link.click();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
       showToast('图片已下载 ✓', 'success');
     }).catch(function (err) {
       console.error('Export error:', err);
@@ -792,41 +839,57 @@
   }
 
   // ─── Copy Image to Clipboard ─────────────────────────────────────
+  // Key point: navigator.clipboard.write() must be invoked synchronously
+  // inside the click handler. Previously it was called only after the
+  // (slow) html2canvas render finished, by which time the user-activation
+  // window had expired (Chrome ~5s, Safari immediately), so the write was
+  // rejected and the code fell back to downloading. Passing a Promise<Blob>
+  // to ClipboardItem keeps the gesture valid while rendering continues.
   function copyImageToClipboard() {
-    var scale = parseInt(settingScale.value);
-    showLoading(true);
+    if (!navigator.clipboard || typeof navigator.clipboard.write !== 'function' ||
+        typeof ClipboardItem === 'undefined') {
+      showToast(window.isSecureContext
+        ? '当前浏览器不支持复制图片，请使用“下载”'
+        : '复制图片需要 HTTPS 或 localhost 环境', 'error');
+      return;
+    }
 
-    sleep(50).then(function () {
-      return html2canvas(captureWrapper, {
-        scale: scale,
-        useCORS: true,
-        backgroundColor: null,
-        logging: false,
-        removeContainer: true,
+    showLoading(true);
+    var blobPromise = renderImageBlob();
+    var writePromise;
+
+    try {
+      // Preferred: write immediately with a pending blob (Chrome 98+, Safari, Firefox 127+)
+      writePromise = navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blobPromise })
+      ]);
+    } catch (e) {
+      // Older engines that don't accept Promise values in ClipboardItem
+      writePromise = blobPromise.then(function (blob) {
+        return navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
       });
-    }).then(function (canvas) {
-      return new Promise(function (resolve, reject) {
-        canvas.toBlob(function (blob) {
-          if (!blob) { reject(new Error('toBlob failed')); return; }
-          navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob })
-          ]).then(function () {
-            showToast('图片已复制到剪贴板 ✓', 'success');
-            resolve();
-          }).catch(function () {
-            // Fallback: download
-            var link = document.createElement('a');
-            link.download = 'marksnap_' + Date.now() + '.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            showToast('浏览器不支持复制图片，已改为下载', 'info');
-            resolve();
-          });
-        }, 'image/png');
-      });
+    }
+
+    writePromise.catch(function (err) {
+      // Promise-valued ClipboardItem rejected by engine: retry with the resolved blob.
+      return blobPromise.then(function (blob) {
+        return navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      }).catch(function () { throw err; });
+    }).then(function () {
+      showToast('图片已复制到剪贴板 ✓', 'success');
     }).catch(function (err) {
       console.error('Copy error:', err);
-      showToast('复制失败：' + err.message, 'error');
+      // Do NOT fall back to download. The rendered image is cached, so a
+      // second click will write instantly within a fresh user gesture.
+      return blobPromise.then(function () {
+        if (!document.hasFocus()) {
+          showToast('复制失败：页面失去焦点，请回到页面后再点一次复制', 'error');
+        } else {
+          showToast('图片已生成，请再点一次“复制”', 'info');
+        }
+      }, function (renderErr) {
+        showToast('复制失败：' + (renderErr && renderErr.message || err.message), 'error');
+      });
     }).finally(function () {
       showLoading(false);
     });
@@ -911,6 +974,14 @@
   // ─── Helpers ─────────────────────────────────────────────────────
   function sleep(ms) {
     return new Promise(function (resolve) { setTimeout(resolve, ms); });
+  }
+
+  // Resolve after the browser has painted (so the loading overlay shows),
+  // without an arbitrary fixed delay.
+  function nextFrame() {
+    return new Promise(function (resolve) {
+      requestAnimationFrame(function () { setTimeout(resolve, 0); });
+    });
   }
 
   // ─── Go! ─────────────────────────────────────────────────────────
