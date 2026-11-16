@@ -828,6 +828,8 @@
 
     var scale = parseFloat(settingScale.value) || 1.5;
     var promise = nextFrame().then(function () {
+      // Disable width transition before cloning so html2canvas never captures
+      // an in-flight width animation frame.
       return html2canvas(captureWrapper, {
         scale: scale,
         useCORS: true,
@@ -835,6 +837,35 @@
         logging: false,
         imageTimeout: 15000,
         removeContainer: true,
+        onclone: function (clonedDoc) {
+          // 1. Strip outer box-shadow & transition on #capture-wrapper
+          var clonedWrapper = clonedDoc.getElementById('capture-wrapper');
+          if (clonedWrapper) {
+            clonedWrapper.style.boxShadow = 'none';
+            clonedWrapper.style.transition = 'none';
+          }
+          // 2. html2canvas renders large box-shadows on #capture-content (gradient themes)
+          //    and .code-block-wrapper as an inverted dark glow covering the interior of
+          //    the card. Replace them with a crisp subtle border for clean export.
+          var clonedContent = clonedDoc.getElementById('capture-content');
+          if (clonedContent && currentTheme.startsWith('gradient-')) {
+            clonedContent.style.boxShadow = 'none';
+          }
+          clonedDoc.querySelectorAll('.code-block-wrapper').forEach(function (el) {
+            el.style.boxShadow = 'none';
+            el.style.border = '1px solid rgba(128, 128, 128, 0.2)';
+          });
+          // 3. Remove loading overlay & toast from the cloned DOM so their
+          //    fixed full-screen dark backdrop can never bleed over the capture.
+          var clonedOverlay = clonedDoc.getElementById('loading-overlay');
+          if (clonedOverlay && clonedOverlay.parentNode) {
+            clonedOverlay.parentNode.removeChild(clonedOverlay);
+          }
+          var clonedToast = clonedDoc.getElementById('toast');
+          if (clonedToast && clonedToast.parentNode) {
+            clonedToast.parentNode.removeChild(clonedToast);
+          }
+        },
       });
     }).then(function (canvas) {
       return new Promise(function (resolve, reject) {
