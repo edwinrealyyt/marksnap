@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="lib/katex.min.css" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css';">
 
   <!-- App Styles -->
-  <link rel="stylesheet" href="style.css?v=1.0.4">
+  <link rel="stylesheet" href="style.css?v=1.0.5">
 </head>
 <body>
 
@@ -96,18 +96,28 @@
     <div class="settings-divider"></div>
 
     <div class="settings-group">
+      <label class="settings-label" for="setting-preset">排版预设</label>
+      <select id="setting-preset" class="settings-select" title="快速切换适合微信/QQ群聊的长图模式或宽屏卡片模式">
+        <option value="chat" selected>📱 群聊长图 (推荐)</option>
+        <option value="mobile">📲 手机窄屏 (380px)</option>
+        <option value="card">💻 宽屏卡片 (720px)</option>
+        <option value="custom">⚙️ 自定义</option>
+      </select>
+    </div>
+
+    <div class="settings-group">
       <label class="settings-label" for="setting-width">宽度</label>
       <div class="settings-control">
-        <input type="range" id="setting-width" min="480" max="1200" value="720" step="20">
-        <span class="settings-value" id="setting-width-value">720px</span>
+        <input type="range" id="setting-width" min="360" max="1200" value="480" step="10">
+        <span class="settings-value" id="setting-width-value">480px</span>
       </div>
     </div>
 
     <div class="settings-group">
       <label class="settings-label" for="setting-padding">内边距</label>
       <div class="settings-control">
-        <input type="range" id="setting-padding" min="16" max="80" value="40" step="4">
-        <span class="settings-value" id="setting-padding-value">40px</span>
+        <input type="range" id="setting-padding" min="16" max="80" value="28" step="4">
+        <span class="settings-value" id="setting-padding-value">28px</span>
       </div>
     </div>
 
@@ -122,11 +132,12 @@
     <div class="settings-group">
       <label class="settings-label" for="setting-scale">
         导出倍率
-        <span class="settings-hint" title="倍率越高，导出PNG的像素分辨率越大（不影响预览效果）。2x 适合普通分享，3x 适合打印或高分屏。">ⓘ</span>
+        <span class="settings-hint" title="倍率决定导出PNG的实际物理像素宽度（宽度 × 倍率）。1.5x 在电脑微信/QQ点开 100% 不会撑爆窗口，同时兼顾手机端清晰度。">ⓘ</span>
       </label>
       <select id="setting-scale" class="settings-select">
-        <option value="1">1x · 普通</option>
-        <option value="2" selected>2x · 高清（推荐）</option>
+        <option value="1">1x · 标准</option>
+        <option value="1.5" selected>1.5x · 群聊适中（推荐）</option>
+        <option value="2">2x · 高清</option>
         <option value="3">3x · 超清</option>
       </select>
     </div>

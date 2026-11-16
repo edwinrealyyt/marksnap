@@ -519,7 +519,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* ---------- Capture Wrapper (the part that gets exported) ---------- */
 #capture-wrapper {
   position: relative;
-  width: 720px;
+  width: 480px;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
@@ -554,7 +554,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 #capture-wrapper.theme-light #capture-content {
   color: #1f2937;
-  padding: 40px;
+  padding: 28px;
 }
 #capture-wrapper.theme-light .watermark {
   color: #6b7280;
@@ -566,7 +566,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 #capture-wrapper.theme-dark #capture-content {
   color: #c9d1d9;
-  padding: 40px;
+  padding: 28px;
 }
 #capture-wrapper.theme-dark .watermark {
   color: #8b949e;
@@ -579,7 +579,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 #capture-wrapper.theme-github #capture-content {
   color: #1f2328;
-  padding: 40px;
+  padding: 28px;
 }
 #capture-wrapper.theme-github .watermark {
   color: #656d76;
@@ -592,9 +592,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 #capture-wrapper.theme-gradient-blue #capture-content {
   background: #ffffff;
   color: #1f2937;
-  margin: 24px;
+  margin: 17px;
   border-radius: 10px;
-  padding: 36px;
+  padding: 28px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 #capture-wrapper.theme-gradient-blue .watermark {
@@ -608,9 +608,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 #capture-wrapper.theme-gradient-sunset #capture-content {
   background: #ffffff;
   color: #1f2937;
-  margin: 24px;
+  margin: 17px;
   border-radius: 10px;
-  padding: 36px;
+  padding: 28px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 #capture-wrapper.theme-gradient-sunset .watermark {
@@ -624,9 +624,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
 #capture-wrapper.theme-gradient-green #capture-content {
   background: #ffffff;
   color: #1f2937;
-  margin: 24px;
+  margin: 17px;
   border-radius: 10px;
-  padding: 36px;
+  padding: 28px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
 }
 #capture-wrapper.theme-gradient-green .watermark {

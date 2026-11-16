@@ -21,6 +21,7 @@
   var fileInput = document.getElementById('file-input');
 
   var themeSelector = document.getElementById('theme-selector');
+  var settingPreset = document.getElementById('setting-preset');
 
   var settingWidth = document.getElementById('setting-width');
   var settingWidthValue = document.getElementById('setting-width-value');
@@ -246,9 +247,34 @@
   ].join('\n');
 
   // ─── Initialize ──────────────────────────────────────────────────
+  var PRESETS = {
+    chat:   { width: 480, padding: 28, fontSize: 15, scale: '1.5' },
+    mobile: { width: 380, padding: 20, fontSize: 14, scale: '2' },
+    card:   { width: 720, padding: 40, fontSize: 15, scale: '2' },
+  };
+
+  function applyPreset(name) {
+    var p = PRESETS[name];
+    if (!p) return;
+    settingWidth.value = p.width;
+    settingWidthValue.textContent = p.width + 'px';
+    captureWrapper.style.width = p.width + 'px';
+
+    settingPadding.value = p.padding;
+    settingPaddingValue.textContent = p.padding + 'px';
+    applyPadding(p.padding);
+
+    settingFontSize.value = p.fontSize;
+    settingFontSizeValue.textContent = p.fontSize + 'px';
+    captureContent.style.fontSize = p.fontSize + 'px';
+
+    settingScale.value = p.scale;
+  }
+
   function init() {
     editor.value = SAMPLE_MD;
     applyTheme('light');
+    applyPreset(settingPreset ? settingPreset.value : 'chat');
     renderPreview();
     bindEvents();
     updateStats();
@@ -269,24 +295,38 @@
       var btn = e.target.closest('.theme-btn');
       if (!btn) return;
       applyTheme(btn.dataset.theme);
+      applyPadding(parseInt(settingPadding.value));
     });
+
+    if (settingPreset) {
+      settingPreset.addEventListener('change', function () {
+        applyPreset(settingPreset.value);
+      });
+    }
 
     settingWidth.addEventListener('input', function () {
       var val = settingWidth.value;
       settingWidthValue.textContent = val + 'px';
       captureWrapper.style.width = val + 'px';
+      if (settingPreset) settingPreset.value = 'custom';
     });
 
     settingPadding.addEventListener('input', function () {
       var val = settingPadding.value;
       settingPaddingValue.textContent = val + 'px';
       applyPadding(parseInt(val));
+      if (settingPreset) settingPreset.value = 'custom';
     });
 
     settingFontSize.addEventListener('input', function () {
       var val = settingFontSize.value;
       settingFontSizeValue.textContent = val + 'px';
       captureContent.style.fontSize = val + 'px';
+      if (settingPreset) settingPreset.value = 'custom';
+    });
+
+    settingScale.addEventListener('change', function () {
+      if (settingPreset) settingPreset.value = 'custom';
     });
 
     settingWatermark.addEventListener('change', function () {
@@ -786,7 +826,7 @@
       return renderCache.promise;
     }
 
-    var scale = parseInt(settingScale.value) || 2;
+    var scale = parseFloat(settingScale.value) || 1.5;
     var promise = nextFrame().then(function () {
       return html2canvas(captureWrapper, {
         scale: scale,
