@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="lib/katex.min.css" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css';">
 
   <!-- App Styles -->
-  <link rel="stylesheet" href="style.css?v=1.0.5">
+  <link rel="stylesheet" href="style.css?v=1.0.6">
 </head>
 <body>
 
@@ -99,7 +99,7 @@
       <label class="settings-label" for="setting-preset">排版预设</label>
       <select id="setting-preset" class="settings-select" title="快速切换适合微信/QQ群聊的长图模式或宽屏卡片模式">
         <option value="chat" selected>📱 群聊长图 (推荐)</option>
-        <option value="mobile">📲 手机窄屏 (380px)</option>
+        <option value="medium">📄 适中竖图 (480px)</option>
         <option value="card">💻 宽屏卡片 (720px)</option>
         <option value="custom">⚙️ 自定义</option>
       </select>
@@ -108,24 +108,24 @@
     <div class="settings-group">
       <label class="settings-label" for="setting-width">宽度</label>
       <div class="settings-control">
-        <input type="range" id="setting-width" min="360" max="1200" value="480" step="10">
-        <span class="settings-value" id="setting-width-value">480px</span>
+        <input type="range" id="setting-width" min="340" max="1200" value="380" step="10">
+        <span class="settings-value" id="setting-width-value">380px</span>
       </div>
     </div>
 
     <div class="settings-group">
       <label class="settings-label" for="setting-padding">内边距</label>
       <div class="settings-control">
-        <input type="range" id="setting-padding" min="16" max="80" value="28" step="4">
-        <span class="settings-value" id="setting-padding-value">28px</span>
+        <input type="range" id="setting-padding" min="16" max="80" value="24" step="4">
+        <span class="settings-value" id="setting-padding-value">24px</span>
       </div>
     </div>
 
     <div class="settings-group">
       <label class="settings-label" for="setting-font-size">字号</label>
       <div class="settings-control">
-        <input type="range" id="setting-font-size" min="12" max="22" value="15" step="1">
-        <span class="settings-value" id="setting-font-size-value">15px</span>
+        <input type="range" id="setting-font-size" min="12" max="22" value="16" step="1">
+        <span class="settings-value" id="setting-font-size-value">16px</span>
       </div>
     </div>
 
@@ -272,6 +272,6 @@
   </script>
 
   <!-- App Script -->
-  <script src="app.js?v=1.0.5"></script>
+  <script src="app.js?v=1.0.6"></script>
 </body>
 </html>

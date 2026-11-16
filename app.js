@@ -248,8 +248,8 @@
 
   // ─── Initialize ──────────────────────────────────────────────────
   var PRESETS = {
-    chat:   { width: 480, padding: 28, fontSize: 15, scale: '1.5' },
-    mobile: { width: 380, padding: 20, fontSize: 14, scale: '2' },
+    chat:   { width: 380, padding: 24, fontSize: 16, scale: '1.5' },
+    medium: { width: 480, padding: 28, fontSize: 15, scale: '1.5' },
     card:   { width: 720, padding: 40, fontSize: 15, scale: '2' },
   };
 
